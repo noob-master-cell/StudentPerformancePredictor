@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, render_template
 import logging
 from src.pipeline.predict_pipeline import CustomData, PredictPipeline
@@ -47,4 +48,4 @@ def predict_datapoint():
             return render_template('home.html', results="An error occurred while making the prediction.")
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+ app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

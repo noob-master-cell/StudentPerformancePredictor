@@ -1,39 +1,51 @@
-from flask import Flask, send_from_directory, jsonify, request
-from src.pipeline.predict_pipeline import PredictPipeline, CustomData
 import os
+from flask import Flask, request, render_template
+import logging
+from src.pipeline.predict_pipeline import CustomData, PredictPipeline
 
-app = Flask(__name__, static_folder='frontend/dist', static_url_path='')
+# Initialize Flask app
+application = Flask(__name__)
+app = application
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 @app.route('/')
-def serve():
-    return send_from_directory(app.static_folder, 'index.html')
+def index():
+    return render_template('index.html')
 
-@app.route('/predictdata', methods=['POST'])
+@app.route('/predictdata', methods=['GET', 'POST'])
 def predict_datapoint():
-    try:
-        data = request.get_json()
-        custom_data = CustomData(
-            gender=data['gender'],
-            race_ethnicity=data['ethnicity'],
-            parental_level_of_education=data['parental_level_of_education'],
-            lunch=data['lunch'],
-            test_preparation_course=data['test_preparation_course'],
-            reading_score=float(data['reading_score']),
-            writing_score=float(data['writing_score'])
-        )
-        pred_df = custom_data.get_data_as_data_frame()
+    if request.method == 'GET':
+        return render_template('home.html')
+    else:
+        try:
+            # Extract form data
+            data = CustomData(
+                gender=request.form.get('gender'),
+                race_ethnicity=request.form.get('ethnicity'),
+                parental_level_of_education=request.form.get('parental_level_of_education'),
+                lunch=request.form.get('lunch'),
+                test_preparation_course=request.form.get('test_preparation_course'),
+                reading_score=float(request.form.get('reading_score')),
+                writing_score=float(request.form.get('writing_score'))
+            )
+            
+            # Convert data to DataFrame
+            pred_df = data.get_data_as_data_frame()
+            logging.info(f"Prediction DataFrame: {pred_df}")
 
-        predict_pipeline = PredictPipeline()
-        results = predict_pipeline.predict(pred_df)
+            # Predict using pipeline
+            predict_pipeline = PredictPipeline()
+            results = predict_pipeline.predict(pred_df)
+            logging.info(f"Prediction Results: {results}")
 
-        return jsonify({"prediction": results[0]})
+            # Render results
+            return render_template('home.html', results=results[0])
+        
+        except Exception as e:
+            logging.error(f"Error in predict_datapoint: {str(e)}")
+            return render_template('home.html', results="An error occurred while making the prediction.")
 
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/<path:path>')
-def serve_react_app(path):
-    return send_from_directory(app.static_folder, 'index.html')
-
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))

@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* index.css */
+
+/* Default to light theme */
+:root {
+  --bg-color: #f8fafc;
+  --text-color: #333;
+  --card-bg: #ffffff;
+  --button-bg: #1d4ed8;
+  --button-hover-bg: #2563eb;
+  --button-text: #ffffff;
+}
+
+/* Dark theme overrides */
+.dark {
+  --bg-color: #1e293b;
+  --text-color: #e2e8f0;
+  --card-bg: #334155;
+  --button-bg: #3b82f6;
+  --button-hover-bg: #2563eb;
+  --button-text: #ffffff;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+.card {
+  background-color: var(--card-bg);
+}
+
+.btn {
+  background-color: var(--button-bg);
+  color: var(--button-text);
+}
+
+.btn:hover {
+  background-color: var(--button-hover-bg);
+}

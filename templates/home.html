@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student Exam Performance Indicator</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        const url = `https://studentperformancepredictor-enro.onrender.com`; // Replace with your Render URL
+        const interval = 30000; // Interval in milliseconds (30 seconds)
+
+        function reloadWebsite() {
+            axios.get(url)
+                .then(response => {
+                    console.log(`Reloaded at ${new Date().toISOString()}: Status Code ${response.status}`);
+                })
+                .catch(error => {
+                    console.error(`Error reloading at ${new Date().toISOString()}:`, error.message);
+                });
+        }
+
+        setInterval(reloadWebsite, interval);
+    </script>
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap");
 
